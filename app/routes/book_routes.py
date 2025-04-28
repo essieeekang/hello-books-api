@@ -65,6 +65,15 @@ def update_book(book_id):
     return Response(status=204, mimetype="application/json")
 
 
+@books_bp.delete("/<book_id>")
+def delete_book(book_id):
+    book = validate_book(book_id)
+    db.session.delete(book)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+
 def validate_book(book_id):
     try:
         book_id = int(book_id)
