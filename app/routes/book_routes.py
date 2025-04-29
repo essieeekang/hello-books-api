@@ -25,7 +25,17 @@ def create_book():
 
 @books_bp.get("")
 def get_all_books():
-    query = db.select(Book).order_by(Book.id)
+    query = db.select(Book)
+
+    title_param = request.args.get("title")
+    if title_param:
+        query = db.select(Book).where(Book.title.ilike(f"%{title_param}%"))
+
+    description_param = request.args.get("description")
+    if description_param:
+        query = query.where(Book.description.ilike(f"%{description_param}%"))
+
+    query = query.order_by(Book.id)
     books = db.session.scalars(query)
 
     books_response = []
@@ -77,7 +87,7 @@ def delete_book(book_id):
 def validate_book(book_id):
     try:
         book_id = int(book_id)
-    except:
+    except ValueError:
         response = {"message": f"book {book_id} invalid"}
         abort(make_response(response, 400))
 
